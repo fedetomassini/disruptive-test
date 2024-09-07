@@ -75,5 +75,5 @@ Esto iniciará tanto el servidor backend con nodemon como el cliente frontend co
 
 - **`DB_NETWORK="contentdb.lhn5w.mongodb.net"`**
 - **`DB_USER="tester"`**
-- **`DB_PASSWORD="cS1jtZbMJHeuzOdP"`**
+- **`DB_PASSWORD="wkU6O5v2v9JdZWnr"`**
 - **`JWT_SECRET="asd090dfmsADSasdK"`**

@@ -1,15 +1,14 @@
-import express from "express";
-import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import cors from "cors";
-import dotenv from "dotenv";
-import swaggerUi from "swagger-ui-express";
-import YAML from "yamljs";
-
-dotenv.config();
+const express = require("express");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
+
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");
 
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
