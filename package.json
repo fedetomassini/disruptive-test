@@ -9,7 +9,7 @@
 	},
 	"scripts": {
 		"start": "concurrently \"npm run server\" \"npm run client\"",
-		"server": "node src/server/server.js",
+		"server": "node server.js",
 		"client": "vite",
 		"dev": "vite",
 		"build": "vite build",

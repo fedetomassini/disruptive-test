@@ -70,3 +70,10 @@ Esto iniciará tanto el servidor backend con nodemon como el cliente frontend co
 
 - **`admin@example.com`**
 - **`admin`**
+
+## Variables de entorno para testeo:
+
+- **`DB_NETWORK="contentdb.lhn5w.mongodb.net"`**
+- **`DB_USER="tester"`**
+- **`DB_PASSWORD="cS1jtZbMJHeuzOdP"`**
+- **`JWT_SECRET="asd090dfmsADSasdK"`**

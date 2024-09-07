@@ -1,14 +1,15 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const cors = require("cors");
-require("dotenv").config();
+import express from "express";
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import cors from "cors";
+import dotenv from "dotenv";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
+
+dotenv.config();
 
 const app = express();
-
-const swaggerUi = require("swagger-ui-express");
-const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");
 
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -19,9 +20,12 @@ app.use(express.json());
 
 // Conexión a MongoDB
 mongoose
-	.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_NETWORK}/`, {
-		dbName: "contentdb",
-	})
+	.connect(
+		`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_NETWORK}/`,
+		{
+			dbName: "contentdb",
+		}
+	)
 	.then(() => console.log("Conectado a contentdb"))
 	.catch((err) => console.error("Error de conexión a contentdb:", err));
 
@@ -91,12 +95,16 @@ app.post("/api/register", async (req, res) => {
 		const { username, email, password, role } = req.body;
 
 		if (role !== "READER" && role !== "CREATOR") {
-			return res.status(400).send({ error: "Rol inválido. Debe ser READER o CREATOR." });
+			return res
+				.status(400)
+				.send({ error: "Rol inválido. Debe ser READER o CREATOR." });
 		}
 
 		const existingUser = await User.findOne({ $or: [{ username }, { email }] });
 		if (existingUser) {
-			return res.status(400).send({ error: "El nombre de usuario o email ya existe." });
+			return res
+				.status(400)
+				.send({ error: "El nombre de usuario o email ya existe." });
 		}
 
 		const hashedPassword = await bcrypt.hash(password, 8);
@@ -116,11 +124,15 @@ app.post("/api/login", async (req, res) => {
 		const { email, password } = req.body;
 		const user = await User.findOne({ email });
 		if (!user) {
-			return res.status(400).send({ error: "Credenciales de inicio de sesión inválidas." });
+			return res
+				.status(400)
+				.send({ error: "Credenciales de inicio de sesión inválidas." });
 		}
 		const isPasswordMatch = await bcrypt.compare(password, user.password);
 		if (!isPasswordMatch) {
-			return res.status(400).send({ error: "Credenciales de inicio de sesión inválidas." });
+			return res
+				.status(400)
+				.send({ error: "Credenciales de inicio de sesión inválidas." });
 		}
 		const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 		res.send({ user, token });
@@ -145,22 +157,28 @@ app.get("/api/profile", authMiddleware, async (req, res) => {
 });
 
 // Crear una nueva categoría (Solo para administradores)
-app.post("/api/categories", authMiddleware, roleMiddleware(["ADMIN"]), async (req, res) => {
-	try {
-		const { name, allowImages, allowVideos, allowTexts, coverImage } = req.body;
-		const category = new Category({
-			name,
-			allowImages,
-			allowVideos,
-			allowTexts,
-			coverImage,
-		});
-		await category.save();
-		res.status(201).send(category);
-	} catch (error) {
-		res.status(400).send(error);
+app.post(
+	"/api/categories",
+	authMiddleware,
+	roleMiddleware(["ADMIN"]),
+	async (req, res) => {
+		try {
+			const { name, allowImages, allowVideos, allowTexts, coverImage } =
+				req.body;
+			const category = new Category({
+				name,
+				allowImages,
+				allowVideos,
+				allowTexts,
+				coverImage,
+			});
+			await category.save();
+			res.status(201).send(category);
+		} catch (error) {
+			res.status(400).send(error);
+		}
 	}
-});
+);
 
 // Obtener todas las categorías
 app.get("/api/categories", authMiddleware, async (req, res) => {
@@ -173,45 +191,59 @@ app.get("/api/categories", authMiddleware, async (req, res) => {
 });
 
 // Crear nuevo contenido (Creador y Administrador)
-app.post("/api/content", authMiddleware, roleMiddleware(["ADMIN", "CREATOR"]), async (req, res) => {
-	try {
-		const { title, type, url, text, category } = req.body;
+app.post(
+	"/api/content",
+	authMiddleware,
+	roleMiddleware(["ADMIN", "CREATOR"]),
+	async (req, res) => {
+		try {
+			const { title, type, url, text, category } = req.body;
 
-		const categoryId = new mongoose.Types.ObjectId.createFromHexString(category);
-		const categoryObj = await Category.findById({ _id: categoryId }, { $set: params }, { new: true });
-		if (!categoryObj) {
-			return res.status(404).send({ error: "Categoría no encontrada." });
-		}
+			const categoryId = new mongoose.Types.ObjectId.createFromHexString(
+				category
+			);
+			const categoryObj = await Category.findById(
+				{ _id: categoryId },
+				{ $set: params },
+				{ new: true }
+			);
+			if (!categoryObj) {
+				return res.status(404).send({ error: "Categoría no encontrada." });
+			}
 
-		if (
-			(type === "image" && !categoryObj.allowImages) ||
-			(type === "video" && !categoryObj.allowVideos) ||
-			(type === "text" && !categoryObj.allowTexts)
-		) {
-			return res.status(400).send({
-				error: "Este tipo de contenido no está permitido para esta categoría.",
+			if (
+				(type === "image" && !categoryObj.allowImages) ||
+				(type === "video" && !categoryObj.allowVideos) ||
+				(type === "text" && !categoryObj.allowTexts)
+			) {
+				return res.status(400).send({
+					error:
+						"Este tipo de contenido no está permitido para esta categoría.",
+				});
+			}
+
+			const content = new Content({
+				title,
+				type,
+				url,
+				text,
+				category,
+				creator: req.user._id,
 			});
+			await content.save();
+			res.status(201).send(content);
+		} catch (error) {
+			res.status(400).send(error);
 		}
-
-		const content = new Content({
-			title,
-			type,
-			url,
-			text,
-			category,
-			creator: req.user._id,
-		});
-		await content.save();
-		res.status(201).send(content);
-	} catch (error) {
-		res.status(400).send(error);
 	}
-});
+);
 
 // Obtener todos los contenidos
 app.get("/api/content", authMiddleware, async (req, res) => {
 	try {
-		const contents = await Content.find().populate("category").populate("creator", "username");
+		const contents = await Content.find()
+			.populate("category")
+			.populate("creator", "username");
 		res.send(contents);
 	} catch (error) {
 		res.status(500).send(error);
@@ -219,35 +251,50 @@ app.get("/api/content", authMiddleware, async (req, res) => {
 });
 
 // Actualizar contenido (Creador y Administrador)
-app.put("/api/content/:id", authMiddleware, roleMiddleware(["ADMIN", "CREATOR"]), async (req, res) => {
-	try {
-		const content = await Content.findById(req.params.id);
-		if (!content) {
-			return res.status(404).send({ error: "Contenido no encontrado." });
+app.put(
+	"/api/content/:id",
+	authMiddleware,
+	roleMiddleware(["ADMIN", "CREATOR"]),
+	async (req, res) => {
+		try {
+			const content = await Content.findById(req.params.id);
+			if (!content) {
+				return res.status(404).send({ error: "Contenido no encontrado." });
+			}
+			if (
+				req.user.role !== "ADMIN" &&
+				content.creator.toString() !== req.user._id.toString()
+			) {
+				return res
+					.status(403)
+					.send({ error: "Solo puedes actualizar tu propio contenido." });
+			}
+			Object.assign(content, req.body);
+			await content.save();
+			res.send(content);
+		} catch (error) {
+			res.status(400).send(error);
 		}
-		if (req.user.role !== "ADMIN" && content.creator.toString() !== req.user._id.toString()) {
-			return res.status(403).send({ error: "Solo puedes actualizar tu propio contenido." });
-		}
-		Object.assign(content, req.body);
-		await content.save();
-		res.send(content);
-	} catch (error) {
-		res.status(400).send(error);
 	}
-});
+);
 
 // Eliminar contenido (Solo para administradores)
-app.delete("/api/content/:id", authMiddleware, roleMiddleware(["ADMIN"]), async (req, res) => {
-	try {
-		const content = await Content.findByIdAndDelete(req.params.id);
-		if (!content) {
-			return res.status(404).send({ error: "Contenido no encontrado." });
+app.delete(
+	"/api/content/:id",
+	authMiddleware,
+	roleMiddleware(["ADMIN"]),
+	async (req, res) => {
+		try {
+			const content = await Content.findByIdAndDelete(req.params.id);
+			if (!content) {
+				return res.status(404).send({ error: "Contenido no encontrado." });
+			}
+			res.send(content);
+		} catch (error) {
+			res.status(500).send(error);
 		}
-		res.send(content);
-	} catch (error) {
-		res.status(500).send(error);
 	}
-});
+);
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;
