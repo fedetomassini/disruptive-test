@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--pastel-pink: #ffd1dc;
+	--pastel-purple: #e0bbe4;
+	--pastel-blue: #bde0fe;
+	--pastel-dark: #4a4a4a;
+	--pastel-accent: #ffa69e;
+	--pastel-accent-dark: #ff8b8b;
+	--pastel-border: #d1d5db;
+	--pastel-placeholder: #9ca3af;
+}
+
+body {
+	@apply bg-pastel-pink text-pastel-dark;
+}
+
+.bg-gradient-to-br {
+	@apply from-pastel-pink via-pastel-purple to-pastel-blue;
+}
+
+.text-pastel-dark {
+	color: var(--pastel-dark);
+}
+
+.text-pastel-accent {
+	color: var(--pastel-accent);
+}
+
+.bg-pastel-accent {
+	background-color: var(--pastel-accent);
+}
+
+.hover\:bg-pastel-accent-dark:hover {
+	background-color: var(--pastel-accent-dark);
+}
+
+.focus\:ring-pastel-accent:focus {
+	--tw-ring-color: var(--pastel-accent);
+}
+
+.focus\:border-pastel-accent:focus {
+	border-color: var(--pastel-accent);
+}
+
+.border-pastel-border {
+	border-color: var(--pastel-border);
+}
+
+.placeholder-pastel-placeholder::placeholder {
+	color: var(--pastel-placeholder);
+}

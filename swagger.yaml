@@ -1,0 +1,553 @@
+openapi: 3.0.0
+info:
+  title: API de Gestión de Contenidos
+  version: 1.0.0
+  description: API para la gestión de usuarios, categorías y contenidos. Permite crear, leer, actualizar y eliminar usuarios, categorías y contenidos.
+servers:
+  - url: http://localhost:5000/api
+paths:
+  /register:
+    post:
+      summary: Registro de nuevo usuario
+      description: Registra un nuevo usuario en el sistema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Nombre de usuario
+                email:
+                  type: string
+                  description: Correo electrónico del usuario
+                password:
+                  type: string
+                  description: Contraseña del usuario
+                role:
+                  type: string
+                  enum: [READER, CREATOR]
+                  description: Rol del usuario
+      responses:
+        "201":
+          description: Usuario registrado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: ID único del usuario
+                      username:
+                        type: string
+                        description: Nombre de usuario
+                      email:
+                        type: string
+                        description: Correo electrónico del usuario
+                      role:
+                        type: string
+                        description: Rol del usuario
+                  token:
+                    type: string
+                    description: Token de autenticación
+        "400":
+          description: Error en el registro del usuario
+
+  /login:
+    post:
+      summary: Inicio de sesión
+      description: Inicia sesión y devuelve un token de autenticación.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Correo electrónico del usuario
+                password:
+                  type: string
+                  description: Contraseña del usuario
+      responses:
+        "200":
+          description: Inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: ID único del usuario
+                      username:
+                        type: string
+                        description: Nombre de usuario
+                      email:
+                        type: string
+                        description: Correo electrónico del usuario
+                      role:
+                        type: string
+                        description: Rol del usuario
+                  token:
+                    type: string
+                    description: Token de autenticación
+        "400":
+          description: Credenciales inválidas
+
+  /profile:
+    get:
+      summary: Obtiene información del perfil del usuario
+      description: Devuelve la información del usuario autenticado.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Información del perfil obtenida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: ID único del usuario
+                  username:
+                    type: string
+                    description: Nombre de usuario
+                  email:
+                    type: string
+                    description: Correo electrónico del usuario
+                  role:
+                    type: string
+                    description: Rol del usuario
+        "401":
+          description: Autenticación requerida
+
+  /categories:
+    get:
+      summary: Obtiene todas las categorías
+      description: Devuelve una lista de todas las categorías disponibles.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de categorías
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      description: ID único de la categoría
+                    name:
+                      type: string
+                      description: Nombre de la categoría
+                    coverImage:
+                      type: string
+                      description: URL de la imagen de portada
+                    allowImages:
+                      type: boolean
+                      description: Permite imágenes en la categoría
+                    allowVideos:
+                      type: boolean
+                      description: Permite videos en la categoría
+                    allowTexts:
+                      type: boolean
+                      description: Permite textos en la categoría
+
+    post:
+      summary: Crea una nueva categoría
+      description: Crea una nueva categoría con la información proporcionada.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre de la categoría
+                coverImage:
+                  type: string
+                  description: URL de la imagen de portada
+                allowImages:
+                  type: boolean
+                  description: Permite imágenes en la categoría
+                allowVideos:
+                  type: boolean
+                  description: Permite videos en la categoría
+                allowTexts:
+                  type: boolean
+                  description: Permite textos en la categoría
+      responses:
+        "201":
+          description: Categoría creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: ID único de la categoría
+                  name:
+                    type: string
+                    description: Nombre de la categoría
+                  coverImage:
+                    type: string
+                    description: URL de la imagen de portada
+                  allowImages:
+                    type: boolean
+                    description: Permite imágenes en la categoría
+                  allowVideos:
+                    type: boolean
+                    description: Permite videos en la categoría
+                  allowTexts:
+                    type: boolean
+                    description: Permite textos en la categoría
+        "401":
+          description: Autenticación requerida
+        "403":
+          description: Permiso denegado
+
+  /categories/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID único de la categoría
+
+    put:
+      summary: Actualiza una categoría existente
+      description: Actualiza la información de una categoría existente.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre de la categoría
+                coverImage:
+                  type: string
+                  description: URL de la imagen de portada
+                allowImages:
+                  type: boolean
+                  description: Permite imágenes en la categoría
+                allowVideos:
+                  type: boolean
+                  description: Permite videos en la categoría
+                allowTexts:
+                  type: boolean
+                  description: Permite textos en la categoría
+      responses:
+        "200":
+          description: Categoría actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: ID único de la categoría
+                  name:
+                    type: string
+                    description: Nombre de la categoría
+                  coverImage:
+                    type: string
+                    description: URL de la imagen de portada
+                  allowImages:
+                    type: boolean
+                    description: Permite imágenes en la categoría
+                  allowVideos:
+                    type: boolean
+                    description: Permite videos en la categoría
+                  allowTexts:
+                    type: boolean
+                    description: Permite textos en la categoría
+        "401":
+          description: Autenticación requerida
+        "403":
+          description: Permiso denegado
+        "404":
+          description: Categoría no encontrada
+
+    delete:
+      summary: Elimina una categoría
+      description: Elimina una categoría existente usando su ID.
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Categoría eliminada exitosamente
+        "401":
+          description: Autenticación requerida
+        "403":
+          description: Permiso denegado
+        "404":
+          description: Categoría no encontrada
+
+  /content:
+    get:
+      summary: Obtiene todos los contenidos
+      description: Devuelve una lista de todos los contenidos disponibles.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de contenidos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      description: ID único del contenido
+                    title:
+                      type: string
+                      description: Título del contenido
+                    type:
+                      type: string
+                      enum: [image, video, text]
+                      description: Tipo de contenido
+                    content:
+                      type: string
+                      description: URL o texto del contenido
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: Fecha de creación del contenido
+                    category:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: ID de la categoría asociada
+                        name:
+                          type: string
+                          description: Nombre de la categoría
+                    creator:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: ID del creador
+                        username:
+                          type: string
+                          description: Nombre de usuario del creador
+
+    post:
+      summary: Crea un nuevo contenido
+      description: Crea un nuevo contenido con la información proporcionada.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título del contenido
+                type:
+                  type: string
+                  enum: [image, video, text]
+                  description: Tipo de contenido
+                url:
+                  type: string
+                  description: URL del contenido (para imágenes y videos)
+                text:
+                  type: string
+                  description: Texto del contenido (para texto)
+                categoryId:
+                  type: string
+                  description: ID de la categoría asociada
+      responses:
+        "201":
+          description: Contenido creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: ID único del contenido
+                  title:
+                    type: string
+                    description: Título del contenido
+                  type:
+                    type: string
+                    enum: [image, video, text]
+                    description: Tipo de contenido
+                  content:
+                    type: string
+                    description: URL o texto del contenido
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: Fecha de creación del contenido
+                  category:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: ID de la categoría asociada
+                      name:
+                        type: string
+                        description: Nombre de la categoría
+                  creator:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: ID del creador
+                      username:
+                        type: string
+                        description: Nombre de usuario del creador
+        "400":
+          description: Error en la creación del contenido
+        "401":
+          description: Autenticación requerida
+        "403":
+          description: Permiso denegado
+
+  /content/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID único del contenido
+
+    put:
+      summary: Actualiza un contenido existente
+      description: Actualiza la información de un contenido existente.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título del contenido
+                type:
+                  type: string
+                  enum: [image, video, text]
+                  description: Tipo de contenido
+                url:
+                  type: string
+                  description: URL del contenido (para imágenes y videos)
+                text:
+                  type: string
+                  description: Texto del contenido (para texto)
+                categoryId:
+                  type: string
+                  description: ID de la categoría asociada
+      responses:
+        "200":
+          description: Contenido actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: ID único del contenido
+                  title:
+                    type: string
+                    description: Título del contenido
+                  type:
+                    type: string
+                    enum: [image, video, text]
+                    description: Tipo de contenido
+                  content:
+                    type: string
+                    description: URL o texto del contenido
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: Fecha de creación del contenido
+                  category:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: ID de la categoría asociada
+                      name:
+                        type: string
+                        description: Nombre de la categoría
+                  creator:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: ID del creador
+                      username:
+                        type: string
+                        description: Nombre de usuario del creador
+        "400":
+          description: Error en la actualización del contenido
+        "401":
+          description: Autenticación requerida
+        "403":
+          description: Permiso denegado
+        "404":
+          description: Contenido no encontrado
+
+    delete:
+      summary: Elimina un contenido
+      description: Elimina un contenido existente usando su ID.
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Contenido eliminado exitosamente
+        "401":
+          description: Autenticación requerida
+        "403":
+          description: Permiso denegado
+        "404":
+          description: Contenido no encontrado
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
