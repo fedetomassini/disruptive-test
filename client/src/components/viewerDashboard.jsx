@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Camera, Video, FileText, Search, Menu, Plus, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+//
+import { config } from "../../config";
 
 export const ViewerDashboard = () => {
 	const [contents, setContents] = useState([]);
@@ -13,6 +15,7 @@ export const ViewerDashboard = () => {
 	const [categories, setCategories] = useState([]);
 	const [userRole, setUserRole] = useState(null);
 
+	const URL = config.url;
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -26,7 +29,7 @@ export const ViewerDashboard = () => {
 				}
 
 				// Obtener el rol del usuario
-				const userResponse = await fetch("http://localhost:5000/api/profile", {
+				const userResponse = await fetch(`${URL}/api/profile`, {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
@@ -40,7 +43,7 @@ export const ViewerDashboard = () => {
 				setUserRole(userData.role);
 
 				// Obtener los contenidos
-				const contentResponse = await fetch("http://localhost:5000/api/content", {
+				const contentResponse = await fetch(`${URL}/api/content`, {
 					method: "GET",
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -55,7 +58,7 @@ export const ViewerDashboard = () => {
 				setContents(contentData);
 
 				// Obtener las categorías
-				const categoryResponse = await fetch("http://localhost:5000/api/categories", {
+				const categoryResponse = await fetch(`${URL}/api/categories`, {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
@@ -95,48 +98,52 @@ export const ViewerDashboard = () => {
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex items-center justify-between h-16">
 						<div className="flex items-center">
-							<img src="/icon.png" className="h-8 w-8 text-pastel-accent mr-2" />
-							<h1 className="text-2xl font-bold text-pastel-dark">Contenido</h1>
+							<img src="/icon.png" className="h-8 w-8 text-pastel-accent mr-2" alt="Icon" />
+							<h1 className="text-xl sm:text-2xl font-bold text-pastel-dark">Mediaverse</h1>
 						</div>
-						<div className="hidden md:block">
-							<div className="flex items-center space-x-4">
-								<input
-									type="text"
-									placeholder="Buscar por título o categoría"
-									className="p-2 rounded-lg bg-white bg-opacity-50 border border-pastel-border text-pastel-dark placeholder-pastel-placeholder focus:outline-none focus:ring-2 focus:ring-pastel-accent"
-									value={searchTerm}
-									onChange={(e) => setSearchTerm(e.target.value)}
-								/>
-								<select
-									className="p-2 rounded-lg bg-white bg-opacity-50 border border-pastel-border text-pastel-dark focus:outline-none focus:ring-2 focus:ring-pastel-accent"
-									onChange={(e) => setCategoryFilter(e.target.value)}
+						<div className="hidden md:block flex-grow max-w-xl mx-4">
+							<input
+								type="text"
+								placeholder="Buscar por título o categoría"
+								className="w-full p-2 rounded-lg bg-white bg-opacity-50 border border-pastel-border text-pastel-dark placeholder-pastel-placeholder focus:outline-none focus:ring-2 focus:ring-pastel-accent"
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
+							/>
+						</div>
+						<div className="hidden md:flex items-center space-x-2">
+							<select
+								className="p-2 rounded-lg bg-white bg-opacity-50 border border-pastel-border text-pastel-dark focus:outline-none focus:ring-2 focus:ring-pastel-accent"
+								onChange={(e) => setCategoryFilter(e.target.value)}
+							>
+								<option value="">Todas las Categorías</option>
+								{categories.map((category) => (
+									<option key={category._id} value={category.name}>
+										{category.name}
+									</option>
+								))}
+							</select>
+							{userRole ? (
+								<button
+									onClick={handleLogout}
+									className="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
 								>
-									<option value="">Todas las Categorías</option>
-									{categories.map((category) => (
-										<option key={category._id} value={category.name}>
-											{category.name}
-										</option>
-									))}
-								</select>
-								{userRole ? (
-									<button
-										onClick={handleLogout}
-										className="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
-									>
-										Deslogearse
-									</button>
-								) : (
-									<button
-										onClick={() => navigate("/login")}
-										className="px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
-									>
-										Loguearse
-									</button>
-								)}
-							</div>
+									Deslogearse
+								</button>
+							) : (
+								<button
+									onClick={() => navigate("/login")}
+									className="px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
+								>
+									Loguearse
+								</button>
+							)}
 						</div>
 						<div className="md:hidden">
-							<button className="text-pastel-dark focus:outline-none" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+							<button
+								className="text-pastel-dark focus:outline-none"
+								onClick={() => setIsMenuOpen(!isMenuOpen)}
+								aria-label="Toggle menu"
+							>
 								<Menu className="h-6 w-6" />
 							</button>
 						</div>
@@ -152,7 +159,7 @@ export const ViewerDashboard = () => {
 						exit={{ opacity: 0, y: -20 }}
 						className="md:hidden bg-white bg-opacity-30 backdrop-filter backdrop-blur-lg"
 					>
-						<div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+						<div className="px-4 py-3 space-y-3">
 							<input
 								type="text"
 								placeholder="Buscar por título o categoría"
@@ -174,23 +181,23 @@ export const ViewerDashboard = () => {
 							{userRole ? (
 								<button
 									onClick={handleLogout}
-									className="px-4 py-2 w-full bg-red-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
+									className="w-full px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
 								>
 									Deslogearse
 								</button>
 							) : (
 								<button
 									onClick={() => navigate("/login")}
-									className="px-4 py-2 w-full bg-blue-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
+									className="w-full px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
 								>
 									Loguearse
 								</button>
 							)}
 							<button
-								className="w-full px-4 py-2 text-pastel-dark hover:bg-pastel-light rounded-lg"
+								className="w-full px-4 py-2 text-pastel-dark hover:bg-pastel-light rounded-lg flex items-center justify-center"
 								onClick={() => setIsMenuOpen(false)}
 							>
-								<X className="h-5 w-5 inline-block mr-1" />
+								<X className="h-5 w-5 mr-1" />
 								Cerrar Menú
 							</button>
 						</div>
@@ -198,11 +205,11 @@ export const ViewerDashboard = () => {
 				)}
 			</AnimatePresence>
 
-			<main className="flex-1 p-6">
+			<main className="flex-1 p-4 sm:p-6">
 				{filteredContents.length === 0 ? (
 					<p className="text-center text-pastel-dark">No hay contenidos disponibles</p>
 				) : (
-					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
 						{filteredContents.map((content) => (
 							<div key={content._id} className="bg-white rounded-lg shadow-md overflow-hidden">
 								<img src={content.coverImage} alt={content.title} className="w-full h-40 object-cover" />
@@ -222,9 +229,9 @@ export const ViewerDashboard = () => {
 						initial={{ opacity: 0, scale: 0.8 }}
 						animate={{ opacity: 1, scale: 1 }}
 						exit={{ opacity: 0, scale: 0.8 }}
-						className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+						className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"
 					>
-						<div className="bg-white p-6 rounded-lg shadow-lg w-11/12 sm:w-96">
+						<div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
 							<h2 className="text-xl font-semibold mb-4">Agregar Nuevo Contenido</h2>
 							<div className="space-y-4">
 								<input
@@ -269,10 +276,16 @@ export const ViewerDashboard = () => {
 									onChange={(e) => setNewContent({ ...newContent, text: e.target.value })}
 								/>
 								<div className="flex justify-end space-x-2">
-									<button onClick={() => setShowAddContent(false)} className="px-4 py-2 bg-gray-300 rounded-lg">
+									<button
+										onClick={() => setShowAddContent(false)}
+										className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition duration-200 ease-in-out"
+									>
 										Cancelar
 									</button>
-									<button onClick={handleCreateContent} className="px-4 py-2 bg-pastel-accent text-white rounded-lg">
+									<button
+										onClick={handleCreateContent}
+										className="px-4 py-2 bg-pastel-accent text-white rounded-lg hover:bg-opacity-90 transition duration-200 ease-in-out"
+									>
 										Agregar
 									</button>
 								</div>

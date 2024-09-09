@@ -1,4 +1,4 @@
-# Disruptive - Test
+# Disruptive - Test (Mediaverse)
 
 Este proyecto es una aplicación frontend construida con **React** y **Vite**. Incluye funcionalidades de autenticación de usuarios, un sistema de gestión de categorías y contenidos, y una interfaz de usuario moderna utilizando **Tailwind CSS** y otros componentes de UI.
 
@@ -35,36 +35,25 @@ Asegúrate de tener instalados los siguientes elementos:
    cd disruptive-test
    ```
 
-2. Instala las dependencias del proyecto:
-
-   ```bash
-   npm install | yarn install | bun install
-   ```
-
-## Uso
-
-### Modo Desarrollo
+2. Uso:
 
 Para ejecutar el servidor de desarrollo, utiliza:
 
 ```bash
-npm run start
+npm run start | yarn run start | pnpm run start | bun run start |
 ```
 
 Esto iniciará tanto el servidor backend con nodemon como el cliente frontend con Vite de manera concurrente.
 
 ## Scripts Disponibles
 
-- **`npm run server`**: Inicia el servidor backend usando nodemon.
-- **`npm run client`**: Inicia el cliente frontend usando Vite.
-- **`npm run dev`**: Alias para iniciar el cliente frontend en modo desarrollo.
-- **`npm run build`**: Construye la aplicación para producción.
-- **`npm run preview`**: Previsualiza la aplicación construida.
-- **`npm run format`**: Formatea el código usando Biome.
-- **`npm run lint`**: Ejecuta el linter para buscar problemas en el código.
-- **`npm run lint:fix`**: Ejecuta el linter y corrige problemas automáticamente.
-- **`npm run check`**: Verifica el código con Biome.
-- **`npm run check:fix`**: Verifica el código y corrige problemas automáticamente.
+- **`npm run start`**: Instala las dependencias del servidor y del cliente, construye el cliente, y luego inicia tanto el servidor backend como el cliente frontend de manera concurrente.
+- **`npm run dev`**: Inicia el entorno de desarrollo, ejecutando el servidor backend y el cliente frontend de manera concurrente.
+- **`npm run i-server`**: Instala las dependencias del servidor backend.
+- **`npm run i-client`**: Instala las dependencias del cliente frontend.
+- **`npm run server`**: Inicia el servidor backend utilizando Node.js.
+- **`npm run client`**: Inicia el cliente frontend utilizando `bun`.
+- **`npm run b-client`**: Construye la aplicación del cliente frontend para producción.
 
 ## Cuenta de ADMIN (test)
 
@@ -73,6 +62,7 @@ Esto iniciará tanto el servidor backend con nodemon como el cliente frontend co
 
 ## Variables de entorno para testeo:
 
+- **`NODE_DEV="development"`**
 - **`DB_NETWORK="contentdb.lhn5w.mongodb.net"`**
 - **`DB_USER="tester"`**
 - **`DB_PASSWORD="wkU6O5v2v9JdZWnr"`**

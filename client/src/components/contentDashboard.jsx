@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Edit2Icon, LogInIcon, LogOutIcon, Menu, Plus, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Camera, Video, FileText, Search, Menu, Plus, X, Edit2Icon } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+//
+import { config } from "../../config";
 
 export const ContentDashboard = () => {
 	const [contents, setContents] = useState([]);
@@ -20,6 +22,7 @@ export const ContentDashboard = () => {
 	const [categories, setCategories] = useState([]);
 	const [userRole, setUserRole] = useState(null);
 
+	const URL = config.url;
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -34,7 +37,7 @@ export const ContentDashboard = () => {
 				}
 
 				// Obtener el rol del usuario
-				const userResponse = await fetch("http://localhost:5000/api/profile", {
+				const userResponse = await fetch(`${URL}/api/profile`, {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
@@ -48,7 +51,7 @@ export const ContentDashboard = () => {
 				setUserRole(userData.role);
 
 				// Obtener los contenidos
-				const contentResponse = await fetch("http://localhost:5000/api/content", {
+				const contentResponse = await fetch(`${URL}/api/content`, {
 					method: "GET",
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -63,7 +66,7 @@ export const ContentDashboard = () => {
 				setContents(contentData);
 
 				// Obtener las categorías
-				const categoryResponse = await fetch("http://localhost:5000/api/categories", {
+				const categoryResponse = await fetch(`${URL}/api/categories`, {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
@@ -100,7 +103,7 @@ export const ContentDashboard = () => {
 
 		if (userRole === "ADMIN" || userRole === "CREATOR") {
 			try {
-				const response = await fetch("http://localhost:5000/api/content", {
+				const response = await fetch(`${URL}/api/content`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -142,67 +145,65 @@ export const ContentDashboard = () => {
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex items-center justify-between h-16">
 						<div className="flex items-center">
-							<img src="/icon.png" className="h-8 w-8 text-pastel-accent mr-2" />
-							<h1 className="text-2xl font-bold text-pastel-dark">Contenido</h1>
+							<img src="/icon.png" className="h-8 w-8 text-pastel-accent mr-2" alt="Icon" />
+							<h1 className="text-xl sm:text-2xl font-bold text-pastel-dark">Mediaverse</h1>
 						</div>
-						<div className="hidden md:block">
-							<div className="flex items-center space-x-4">
-								<input
-									type="text"
-									placeholder="Buscar por título o categoría"
-									className="p-2 rounded-lg bg-white bg-opacity-50 border border-pastel-border text-pastel-dark placeholder-pastel-placeholder focus:outline-none focus:ring-2 focus:ring-pastel-accent"
-									value={searchTerm}
-									onChange={(e) => setSearchTerm(e.target.value)}
-								/>
-								<select
-									className="p-2 rounded-lg bg-white bg-opacity-50 border border-pastel-border text-pastel-dark focus:outline-none focus:ring-2 focus:ring-pastel-accent"
-									onChange={(e) => setCategoryFilter(e.target.value)}
+						<div className="hidden md:block w-full max-w-xl mx-4">
+							<input
+								type="text"
+								placeholder="Buscar por título o categoría"
+								className="w-full p-2 rounded-lg bg-white bg-opacity-50 border border-pastel-border text-pastel-dark placeholder-pastel-placeholder focus:outline-none focus:ring-2 focus:ring-pastel-accent"
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
+							/>
+						</div>
+						<div className="hidden md:flex items-center space-x-2">
+							<select
+								className="p-2 rounded-lg bg-white bg-opacity-50 border border-pastel-border text-pastel-dark focus:outline-none focus:ring-2 focus:ring-pastel-accent"
+								onChange={(e) => setCategoryFilter(e.target.value)}
+							>
+								<option value="">Todas las Categorías</option>
+								{categories.map((category) => (
+									<option key={category._id} value={category.name}>
+										{category.name}
+									</option>
+								))}
+							</select>
+							{(userRole === "CREATOR" || userRole === "ADMIN") && (
+								<motion.button
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
+									onClick={() => setShowAddContent(true)}
+									className="p-2 bg-pastel-accent text-white rounded-lg hover:bg-pastel-accent-dark transition duration-200 ease-in-out"
 								>
-									<option value="">Todas las Categorías</option>
-									{categories.map((category) => (
-										<option key={category._id} value={category.name}>
-											{category.name}
-										</option>
-									))}
-								</select>
-								{(userRole === "CREATOR" || userRole === "ADMIN") && (
-									<motion.button
-										whileHover={{ scale: 1.05 }}
-										whileTap={{ scale: 0.95 }}
-										onClick={() => setShowAddContent(true)}
-										className="px-4 py-2 bg-pastel-accent text-white rounded-lg hover:bg-pastel-accent-dark transition duration-200 ease-in-out"
-									>
-										<Plus className="h-5 w-5 inline-block mr-1" />
-										Agregar Contenido
-									</motion.button>
-								)}
-								{userRole === "ADMIN" && (
-									<motion.button
-										whileHover={{ scale: 1.05 }}
-										whileTap={{ scale: 0.95 }}
-										onClick={() => navigate("/contents/categories")}
-										className="px-4 py-2 bg-pastel-accent text-white rounded-lg hover:bg-pastel-accent-dark transition duration-200 ease-in-out"
-									>
-										<Edit2Icon className="h-5 w-5 inline-block mr-1" />
-										Editar Categorías
-									</motion.button>
-								)}
-								{userRole ? (
-									<button
-										onClick={handleLogout}
-										className="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
-									>
-										Deslogearse
-									</button>
-								) : (
-									<button
-										onClick={() => navigate("/login")}
-										className="px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
-									>
-										Loguearse
-									</button>
-								)}
-							</div>
+									<Plus className="h-5 w-5" />
+								</motion.button>
+							)}
+							{userRole === "ADMIN" && (
+								<motion.button
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
+									onClick={() => navigate("/admin/edit-categories")}
+									className="p-2 bg-pastel-accent text-white rounded-lg hover:bg-pastel-accent-dark transition duration-200 ease-in-out"
+								>
+									<Edit2Icon className="h-5 w-5" />
+								</motion.button>
+							)}
+							{userRole ? (
+								<button
+									onClick={handleLogout}
+									className="p-2 bg-red-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
+								>
+									<LogOutIcon className="h-5 w-5" />
+								</button>
+							) : (
+								<button
+									onClick={() => navigate("/login")}
+									className="p-2 bg-blue-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
+								>
+									<LogInIcon className="h-5 w-5" />
+								</button>
+							)}
 						</div>
 						<div className="md:hidden">
 							<button className="text-pastel-dark focus:outline-none" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -240,54 +241,47 @@ export const ContentDashboard = () => {
 									</option>
 								))}
 							</select>
-							{(userRole === "CREATOR" || userRole === "ADMIN") && (
-								<motion.button
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-									onClick={() => setShowAddContent(true)}
-									className="px-4 py-2 bg-pastel-accent text-white rounded-lg hover:bg-pastel-accent-dark transition duration-200 ease-in-out"
-								>
-									<Plus className="h-5 w-5 inline-block mr-1" />
-									Agregar Contenido
-								</motion.button>
-							)}
-							{userRole === "ADMIN" && (
-								<motion.button
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-									onClick={() => navigate("/contents/categories")}
-									className="px-4 py-2 bg-pastel-accent text-white rounded-lg hover:bg-pastel-accent-dark transition duration-200 ease-in-out"
-								>
-									<Edit2Icon className="h-5 w-5 inline-block mr-1" />
-									Editar Categorías
-								</motion.button>
-							)}
-							{userRole === "ADMIN" && (
-								<motion.button
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-									onClick={() => navigate("/contents/categories")}
-									className="px-4 py-2 bg-pastel-accent text-white rounded-lg hover:bg-pastel-accent-dark transition duration-200 ease-in-out"
-								>
-									<Edit2Icon className="h-5 w-5 inline-block mr-1" />
-									Editar Categorías
-								</motion.button>
-							)}
-							{userRole ? (
-								<button
-									onClick={handleLogout}
-									className="px-4 py-2 w-full bg-red-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
-								>
-									Deslogearse
-								</button>
-							) : (
-								<button
-									onClick={() => navigate("/login")}
-									className="px-4 py-2 w-full bg-blue-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
-								>
-									Loguearse
-								</button>
-							)}
+							<div className="grid grid-cols-2 gap-2">
+								{(userRole === "CREATOR" || userRole === "ADMIN") && (
+									<motion.button
+										whileHover={{ scale: 1.05 }}
+										whileTap={{ scale: 0.95 }}
+										onClick={() => setShowAddContent(true)}
+										className="p-2 bg-pastel-accent text-white rounded-lg hover:bg-pastel-accent-dark transition duration-200 ease-in-out flex items-center justify-center"
+									>
+										<Plus className="h-5 w-5 mr-1" />
+										<span className="text-sm">Agregar</span>
+									</motion.button>
+								)}
+								{userRole === "ADMIN" && (
+									<motion.button
+										whileHover={{ scale: 1.05 }}
+										whileTap={{ scale: 0.95 }}
+										onClick={() => navigate("/admin/edit-categories")}
+										className="p-2 bg-pastel-accent text-white rounded-lg hover:bg-pastel-accent-dark transition duration-200 ease-in-out flex items-center justify-center"
+									>
+										<Edit2Icon className="h-5 w-5 mr-1" />
+										<span className="text-sm">Editar</span>
+									</motion.button>
+								)}
+								{userRole ? (
+									<button
+										onClick={handleLogout}
+										className="p-2 bg-red-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out flex items-center justify-center"
+									>
+										<LogOutIcon className="h-5 w-5 mr-1" />
+										<span className="text-sm">Salir</span>
+									</button>
+								) : (
+									<button
+										onClick={() => navigate("/login")}
+										className="p-2 bg-blue-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out flex items-center justify-center"
+									>
+										<LogInIcon className="h-5 w-5 mr-1" />
+										<span className="text-sm">Entrar</span>
+									</button>
+								)}
+							</div>
 						</div>
 					</motion.div>
 				)}
@@ -401,47 +395,6 @@ export const ContentDashboard = () => {
 						</motion.div>
 					)}
 				</AnimatePresence>
-
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-					{filteredContents
-						.map((content) => (
-							<motion.div
-								key={content.category._id}
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.3 }}
-								className="bg-white bg-opacity-30 backdrop-filter backdrop-blur-lg p-6 rounded-lg shadow-lg"
-							>
-								<img
-									src={content.category.coverImageUrl}
-									alt={content.category.name}
-									className="w-full h-48 object-cover rounded-lg mb-4"
-								/>
-								<h2 className="text-xl font-bold text-pastel-dark mb-4">{content.category.name}</h2>
-								{(userRole === "READER" || userRole === "ADMIN" || userRole === "CREATOR") && (
-									<div className="space-y-4">
-										{content.type === "image" && (
-											<img src={content.url} alt={content.title} className="w-full h-48 object-cover rounded-lg" />
-										)}
-										{content.type === "video" && (
-											<video controls className="w-full h-48 object-cover rounded-lg">
-												<source src={content.url} type="video/mp4" />
-												Your browser does not support the video tag.
-											</video>
-										)}
-										{content.type === "text" && <p className="text-pastel-dark">{content.text}</p>}
-										<p className="text-sm text-pastel-dark opacity-80">Créditos: {content.creator.username}</p>
-									</div>
-								)}
-								{userRole !== "READER" && (
-									<p className="text-sm text-pastel-dark opacity-80 mt-4">
-										Contenidos disponibles para lectura sólo para usuarios registrados como Lector.
-									</p>
-								)}
-							</motion.div>
-						))
-						.filter((content, index, self) => index === self.findIndex((t) => t.category._id === content.category._id))}
-				</div>
 			</main>
 		</div>
 	);

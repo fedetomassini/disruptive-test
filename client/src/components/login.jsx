@@ -1,25 +1,29 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { LockIcon, MailIcon } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { LockIcon, MailIcon, UserIcon, User2Icon } from "lucide-react";
+//
+import { config } from "../../config";
 
-export const Register = () => {
+export const Login = () => {
 	const [formData, setFormData] = useState({
-		username: "",
 		email: "",
 		password: "",
-		role: "READER",
 	});
+
+	const URL = config.url;
+	const navigate = useNavigate();
 
 	const handleChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
-	const handleRegister = async (e) => {
+	const handleLogin = async (e) => {
 		e.preventDefault();
 
 		try {
-			const response = await fetch("http://localhost:5000/api/register", {
+			const response = await fetch(`${URL}/api/login`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -37,9 +41,11 @@ export const Register = () => {
 			}
 
 			if (response.ok) {
-				toast.success("¡Registro exitoso!");
+				localStorage.setItem("token", data.token);
+				navigate("/home");
+				toast.success("Inicio de sesión exitoso");
 			} else {
-				toast.error("Error al registrar: ", response.statusText);
+				toast.error(data.message || "Error al ingresar");
 			}
 		} catch (error) {
 			console.error("Error al enviar el formulario:", error);
@@ -61,7 +67,7 @@ export const Register = () => {
 						transition={{ delay: 0.2, duration: 0.5 }}
 						className="mt-6 text-center text-4xl font-extrabold text-pastel-dark"
 					>
-						Registrarse
+						Iniciar Sesión
 					</motion.h2>
 					<motion.p
 						initial={{ opacity: 0 }}
@@ -69,12 +75,12 @@ export const Register = () => {
 						transition={{ delay: 0.3, duration: 0.5 }}
 						className="mt-2 text-center text-sm text-pastel-dark"
 					>
-						¿Ya tienes una cuenta?{" "}
+						¿No tienes una cuenta?{" "}
 						<a
-							href="/login"
+							href="/register"
 							className="font-medium text-pastel-accent hover:text-pastel-accent-dark transition-colors duration-200"
 						>
-							Inicia sesión
+							Regístrate
 						</a>
 					</motion.p>
 				</div>
@@ -84,36 +90,21 @@ export const Register = () => {
 					animate={{ opacity: 1 }}
 					transition={{ delay: 0.4, duration: 0.5 }}
 					className="space-y-6"
-					onSubmit={handleRegister}
+					onSubmit={handleLogin}
 				>
 					<div>
-						<label htmlFor="username" className="block text-sm font-medium text-pastel-dark">
-							Usuario
-						</label>
-						<div className="mt-1 relative rounded-md shadow-sm">
-							<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-								<UserIcon className="h-5 w-5 text-pastel-dark" aria-hidden="true" />
-							</div>
-							<input
-								id="username"
-								name="username"
-								type="text"
-								autoComplete="off"
-								required
-								onChange={handleChange}
-								className="appearance-none block w-full pl-10 px-4 py-3 border border-pastel-border rounded-md bg-white bg-opacity-50 placeholder-pastel-placeholder focus:outline-none focus:ring-2 focus:ring-pastel-accent focus:border-pastel-accent transition duration-200 ease-in-out text-pastel-dark sm:text-sm"
-								placeholder="Tu nombre de usuario"
-							/>
-						</div>
-					</div>
-
-					<div>
-						<label htmlFor="email" className="block text-sm font-medium text-pastel-dark">
+						<label
+							htmlFor="email"
+							className="block text-sm font-medium text-pastel-dark"
+						>
 							Email
 						</label>
 						<div className="mt-1 relative rounded-md shadow-sm">
 							<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-								<MailIcon className="h-5 w-5 text-pastel-dark" aria-hidden="true" />
+								<MailIcon
+									className="h-5 w-5 text-pastel-dark"
+									aria-hidden="true"
+								/>
 							</div>
 							<input
 								id="email"
@@ -129,12 +120,18 @@ export const Register = () => {
 					</div>
 
 					<div>
-						<label htmlFor="password" className="block text-sm font-medium text-pastel-dark">
+						<label
+							htmlFor="password"
+							className="block text-sm font-medium text-pastel-dark"
+						>
 							Contraseña
 						</label>
 						<div className="mt-1 relative rounded-md shadow-sm">
 							<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-								<LockIcon className="h-5 w-5 text-pastel-dark" aria-hidden="true" />
+								<LockIcon
+									className="h-5 w-5 text-pastel-dark"
+									aria-hidden="true"
+								/>
 							</div>
 							<input
 								id="password"
@@ -150,33 +147,13 @@ export const Register = () => {
 					</div>
 
 					<div>
-						<label htmlFor="role" className="block text-sm font-medium text-pastel-dark">
-							Rol
-						</label>
-						<div className="mt-1 relative rounded-md shadow-sm">
-							<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-								<User2Icon className="h-5 w-5 text-pastel-dark" aria-hidden="true" />
-							</div>
-							<select
-								id="role"
-								name="role"
-								onChange={handleChange}
-								className="appearance-none block w-full pl-10 px-4 py-3 border border-pastel-border rounded-md bg-white bg-opacity-50 text-pastel-dark focus:outline-none focus:ring-2 focus:ring-pastel-accent focus:border-pastel-accent transition duration-200 ease-in-out sm:text-sm"
-							>
-								<option value="CREATOR">Creador</option>
-								<option value="READER">Lector</option>
-							</select>
-						</div>
-					</div>
-
-					<div>
 						<motion.button
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							type="submit"
 							className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pastel-accent hover:bg-pastel-accent-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pastel-accent transition duration-200 ease-in-out"
 						>
-							Registrarse
+							Iniciar Sesión
 						</motion.button>
 					</div>
 				</motion.form>

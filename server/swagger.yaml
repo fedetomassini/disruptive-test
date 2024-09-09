@@ -3,8 +3,6 @@ info:
   title: API de Gestión de Contenidos
   version: 1.0.0
   description: API para la gestión de usuarios, categorías y contenidos. Permite crear, leer, actualizar y eliminar usuarios, categorías y contenidos.
-servers:
-  - url: http://localhost:5000/api
 paths:
   /register:
     post:

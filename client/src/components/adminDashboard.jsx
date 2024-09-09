@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Edit, Plus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { motion } from "framer-motion";
-import { Plus, Edit, Trash2 } from "lucide-react";
+//
+import { config } from "../../config";
 
 export const AdminDashboard = () => {
 	const [categories, setCategories] = useState([]);
@@ -15,13 +17,14 @@ export const AdminDashboard = () => {
 	});
 	const [editingCategory, setEditingCategory] = useState(null);
 
+	const URL = config.url;
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const fetchCategories = async () => {
 			const token = localStorage.getItem("token");
 
-			const response = await fetch("http://localhost:5000/api/categories", {
+			const response = await fetch(`${URL}/api/categories`, {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -49,7 +52,7 @@ export const AdminDashboard = () => {
 			return;
 		}
 		const token = localStorage.getItem("token");
-		const response = await fetch("http://localhost:5000/api/categories", {
+		const response = await fetch(`${URL}/api/categories`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -74,7 +77,7 @@ export const AdminDashboard = () => {
 
 	const handleUpdateCategory = async () => {
 		const token = localStorage.getItem("token");
-		const response = await fetch(`http://localhost:5000/api/categories/${editingCategory._id}`, {
+		const response = await fetch(`${URL}/api/categories/${editingCategory._id}`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
@@ -90,7 +93,7 @@ export const AdminDashboard = () => {
 	const handleDeleteCategory = async (id) => {
 		if (toast.success("Has eliminado la categoría.")) {
 			const token = localStorage.getItem("token");
-			await fetch(`http://localhost:5000/api/categories/${id}`, {
+			await fetch(`${URL}/api/categories/${id}`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
@@ -107,11 +110,11 @@ export const AdminDashboard = () => {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-pastel-pink via-pastel-purple to-pastel-blue p-8">
-			<div className="max-w-4xl mx-auto bg-white bg-opacity-30 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg p-8 relative">
+		<div className="min-h-screen bg-gradient-to-br from-pastel-pink via-pastel-purple to-pastel-blue p-4 sm:p-8">
+			<div className="max-w-4xl mx-auto bg-white bg-opacity-30 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg p-4 sm:p-8 relative">
 				{editingCategory && (
-					<div className="fixed inset-0 flex items-center justify-center z-50">
-						<div className="bg-white p-4 rounded-lg shadow-md w-11/12 max-w-md">
+					<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+						<div className="bg-white p-4 rounded-lg shadow-md w-full max-w-md">
 							<h4 className="text-xl font-bold mb-4">Editar Categoría</h4>
 							<input
 								type="text"
@@ -139,20 +142,19 @@ export const AdminDashboard = () => {
 								placeholder="URL de portada para la categoría..."
 								className="w-full p-2 mb-4 rounded-lg border"
 							/>
-							{/* Agrega más campos según sea necesario */}
-							<div className="flex space-x-4">
+							<div className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
 								<motion.button
 									whileHover={{ scale: 1.05 }}
 									whileTap={{ scale: 0.95 }}
 									onClick={handleUpdateCategory}
-									className="px-4 py-2 inline-flex items-center bg-pastel-accent text-white rounded-lg"
+									className="px-4 py-2 inline-flex items-center justify-center bg-pastel-accent text-white rounded-lg w-full sm:w-auto"
 								>
 									<Edit className="h-5 w-5 mr-2" />
 									Actualizar
 								</motion.button>
 								<button
 									onClick={() => setEditingCategory(null)}
-									className="px-4 py-2 bg-gray-400 text-white rounded-lg"
+									className="px-4 py-2 bg-gray-400 text-white rounded-lg w-full sm:w-auto"
 								>
 									Cancelar
 								</button>
@@ -160,8 +162,8 @@ export const AdminDashboard = () => {
 						</div>
 					</div>
 				)}
-				<h2 className="text-3xl font-bold text-pastel-dark mb-8">Administrar Categorías</h2>
-				<div className="space-y-4 mb-8">
+				<h2 className="text-2xl sm:text-3xl font-bold text-pastel-dark mb-6 sm:mb-8">Administrar Categorías</h2>
+				<div className="space-y-4 mb-6 sm:mb-8">
 					<input
 						type="text"
 						name="name"
@@ -178,7 +180,7 @@ export const AdminDashboard = () => {
 						placeholder="URL de portada para la categoría..."
 						className="w-full p-2 rounded-lg bg-white bg-opacity-50 border border-pastel-border text-pastel-dark placeholder-pastel-placeholder focus:outline-none focus:ring-2 focus:ring-pastel-accent"
 					/>
-					<div className="flex space-x-4 max-md:flex-col items-start ">
+					<div className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
 						<label className="flex items-center space-x-2 text-pastel-dark">
 							<input
 								type="checkbox"
@@ -210,7 +212,7 @@ export const AdminDashboard = () => {
 							<span>Documentos</span>
 						</label>
 					</div>
-					<div className="flex-col space-y-2">
+					<div className="flex flex-col space-y-2">
 						<motion.button
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
@@ -221,7 +223,7 @@ export const AdminDashboard = () => {
 							Crear Categoría
 						</motion.button>
 						<button
-							onClick={() => navigate("/contents")}
+							onClick={() => navigate("/")}
 							className="px-4 py-2 w-full bg-indigo-400 text-white rounded-lg hover:bg-opacity-70 transition duration-200 ease-in-out"
 						>
 							Ver Contenidos
@@ -235,15 +237,15 @@ export const AdminDashboard = () => {
 					</div>
 				</div>
 				<div>
-					<h3 className="text-2xl font-bold text-pastel-dark mb-4">Categorías Existentes</h3>
+					<h3 className="text-xl sm:text-2xl font-bold text-pastel-dark mb-4">Categorías Existentes</h3>
 					<ul className="space-y-4">
 						{categories.map((category) => (
 							<li
 								key={category._id}
-								className="flex items-center justify-between bg-white bg-opacity-50 p-4 rounded-lg"
+								className="flex flex-col sm:flex-row sm:items-center justify-between bg-white bg-opacity-50 p-4 rounded-lg space-y-2 sm:space-y-0"
 							>
 								<span className="text-pastel-dark">{category.name}</span>
-								<div className="flex space-x-2">
+								<div className="flex space-x-2 justify-end sm:justify-start">
 									<motion.button
 										whileHover={{ scale: 1.1 }}
 										whileTap={{ scale: 0.9 }}

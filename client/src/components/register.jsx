@@ -1,26 +1,29 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { LockIcon, MailIcon, User2Icon, UserIcon } from "lucide-react";
+import { useState } from "react";
 import { toast } from "react-toastify";
-import { LockIcon, MailIcon } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+//
+import { config } from "../../config";
 
-export const Login = () => {
+export const Register = () => {
 	const [formData, setFormData] = useState({
+		username: "",
 		email: "",
 		password: "",
+		role: "READER",
 	});
 
-	const navigate = useNavigate();
+	const URL = config.url;
 
 	const handleChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
 
-	const handleLogin = async (e) => {
+	const handleRegister = async (e) => {
 		e.preventDefault();
 
 		try {
-			const response = await fetch("http://localhost:5000/api/login", {
+			const response = await fetch(`${URL}/api/register`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -29,20 +32,18 @@ export const Login = () => {
 			});
 
 			const contentType = response.headers.get("content-type");
-			let data;
+			let _data;
 
 			if (contentType && contentType.indexOf("application/json") !== -1) {
-				data = await response.json();
+				_data = await response.json();
 			} else {
-				data = await response.text();
+				_data = await response.text();
 			}
 
 			if (response.ok) {
-				localStorage.setItem("token", data.token);
-				navigate("/home");
-				toast.success("Inicio de sesión exitoso");
+				toast.success("¡Registro exitoso!");
 			} else {
-				toast.error(data.message || "Error al ingresar");
+				toast.error("Error al registrar: ", response.statusText);
 			}
 		} catch (error) {
 			console.error("Error al enviar el formulario:", error);
@@ -64,7 +65,7 @@ export const Login = () => {
 						transition={{ delay: 0.2, duration: 0.5 }}
 						className="mt-6 text-center text-4xl font-extrabold text-pastel-dark"
 					>
-						Iniciar Sesión
+						Registrarse
 					</motion.h2>
 					<motion.p
 						initial={{ opacity: 0 }}
@@ -72,12 +73,12 @@ export const Login = () => {
 						transition={{ delay: 0.3, duration: 0.5 }}
 						className="mt-2 text-center text-sm text-pastel-dark"
 					>
-						¿No tienes una cuenta?{" "}
+						¿Ya tienes una cuenta?{" "}
 						<a
-							href="/register"
+							href="/login"
 							className="font-medium text-pastel-accent hover:text-pastel-accent-dark transition-colors duration-200"
 						>
-							Regístrate
+							Inicia sesión
 						</a>
 					</motion.p>
 				</div>
@@ -87,8 +88,29 @@ export const Login = () => {
 					animate={{ opacity: 1 }}
 					transition={{ delay: 0.4, duration: 0.5 }}
 					className="space-y-6"
-					onSubmit={handleLogin}
+					onSubmit={handleRegister}
 				>
+					<div>
+						<label htmlFor="username" className="block text-sm font-medium text-pastel-dark">
+							Usuario
+						</label>
+						<div className="mt-1 relative rounded-md shadow-sm">
+							<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<UserIcon className="h-5 w-5 text-pastel-dark" aria-hidden="true" />
+							</div>
+							<input
+								id="username"
+								name="username"
+								type="text"
+								autoComplete="off"
+								required
+								onChange={handleChange}
+								className="appearance-none block w-full pl-10 px-4 py-3 border border-pastel-border rounded-md bg-white bg-opacity-50 placeholder-pastel-placeholder focus:outline-none focus:ring-2 focus:ring-pastel-accent focus:border-pastel-accent transition duration-200 ease-in-out text-pastel-dark sm:text-sm"
+								placeholder="Tu nombre de usuario"
+							/>
+						</div>
+					</div>
+
 					<div>
 						<label htmlFor="email" className="block text-sm font-medium text-pastel-dark">
 							Email
@@ -132,13 +154,33 @@ export const Login = () => {
 					</div>
 
 					<div>
+						<label htmlFor="role" className="block text-sm font-medium text-pastel-dark">
+							Rol
+						</label>
+						<div className="mt-1 relative rounded-md shadow-sm">
+							<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<User2Icon className="h-5 w-5 text-pastel-dark" aria-hidden="true" />
+							</div>
+							<select
+								id="role"
+								name="role"
+								onChange={handleChange}
+								className="appearance-none block w-full pl-10 px-4 py-3 border border-pastel-border rounded-md bg-white bg-opacity-50 text-pastel-dark focus:outline-none focus:ring-2 focus:ring-pastel-accent focus:border-pastel-accent transition duration-200 ease-in-out sm:text-sm"
+							>
+								<option value="CREATOR">Creador</option>
+								<option value="READER">Lector</option>
+							</select>
+						</div>
+					</div>
+
+					<div>
 						<motion.button
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							type="submit"
 							className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pastel-accent hover:bg-pastel-accent-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pastel-accent transition duration-200 ease-in-out"
 						>
-							Iniciar Sesión
+							Registrarse
 						</motion.button>
 					</div>
 				</motion.form>

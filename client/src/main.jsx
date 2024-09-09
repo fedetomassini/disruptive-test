@@ -1,11 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ToastContainer, Bounce } from "react-toastify";
+import { Bounce, ToastContainer } from "react-toastify";
 // Globals Styles \\
 import "./globals.scss";
 import "react-toastify/dist/ReactToastify.css";
 // Components \\
-import { App } from "@/App";
+import { App } from "@/app";
 
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
