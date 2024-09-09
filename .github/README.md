@@ -31,7 +31,7 @@ Asegúrate de tener instalados los siguientes elementos:
 1. Clona este repositorio en tu máquina local:
 
    ```bash
-   git clone https://github.com/usuario/disruptive-test.git
+   git clone https://github.com/fedetomassini/disruptive-test.git
    cd disruptive-test
    ```
 
